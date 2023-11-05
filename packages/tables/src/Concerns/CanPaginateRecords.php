@@ -2,6 +2,8 @@
 
 namespace Filament\Tables\Concerns;
 
+use Closure;
+use Filament\Tables\Enums\PaginationLayout;
 use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -12,6 +14,8 @@ trait CanPaginateRecords
      * @var int | string | null
      */
     public $tableRecordsPerPage = null;
+
+    protected PaginationLayout | Closure | null $paginationLayout = PaginationLayout::AboveContent;
 
     protected int | string | null $defaultTableRecordsPerPageSelectOption = null;
 
@@ -94,5 +98,12 @@ trait CanPaginateRecords
     protected function isTablePaginationEnabled(): bool
     {
         return true;
+    }
+
+    public function paginationLayout(PaginationLayout | Closure | null $pagnationLayout): static
+    {
+        $this->paginationLayout = $pagnationLayout;
+
+        return $this;
     }
 }

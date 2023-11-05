@@ -3,12 +3,14 @@
 namespace Filament\Tables\Table\Concerns;
 
 use Closure;
+use Filament\Tables\Enums\PaginationLayout;
 use Illuminate\Support\Arr;
 
 trait CanPaginateRecords
 {
     protected int | string | Closure | null $defaultPaginationPageOption = null;
 
+    protected PaginationLayout $paginationLayout = PaginationLayout::BelowContent;
     protected bool | Closure $isPaginated = true;
 
     protected bool | Closure $isPaginatedWhileReordering = false;
@@ -17,6 +19,13 @@ trait CanPaginateRecords
      * @var array<int | string> | Closure | null
      */
     protected array | Closure | null $paginationPageOptions = null;
+
+    public function paginationLayout(PaginationLayout | Closure $layout): static
+    {
+        $this->paginationLayout = $layout;
+
+        return $this;
+    }
 
     public function defaultPaginationPageOption(int | string | Closure | null $option): static
     {
@@ -90,5 +99,10 @@ trait CanPaginateRecords
     public function isPaginatedWhileReordering(): bool
     {
         return (bool) $this->evaluate($this->isPaginatedWhileReordering);
+    }
+
+    public function getPaginationLayout(): PaginationLayout
+    {
+        return $this->paginationLayout;
     }
 }

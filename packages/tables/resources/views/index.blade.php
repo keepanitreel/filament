@@ -3,6 +3,7 @@
     use Filament\Support\Facades\FilamentView;
     use Filament\Tables\Enums\ActionsPosition;
     use Filament\Tables\Enums\FiltersLayout;
+    use Filament\Tables\Enums\PaginationLayout;
     use Filament\Tables\Enums\RecordCheckboxPosition;
 
     $actions = $getActions();
@@ -18,6 +19,7 @@
     $hasColumnsLayout = $hasColumnsLayout();
     $hasSummary = $hasSummary();
     $header = $getHeader();
+    $paginationLayout = $getPaginationLayout();
     $headerActions = array_filter(
         $getHeaderActions(),
         fn (\Filament\Tables\Actions\Action | \Filament\Tables\Actions\BulkAction | \Filament\Tables\Actions\ActionGroup $action): bool => $action->isVisible(),
@@ -47,6 +49,8 @@
     $hasFiltersAboveContent = $hasFilters && in_array($filtersLayout, [FiltersLayout::AboveContent, FiltersLayout::AboveContentCollapsible]);
     $hasFiltersAboveContentCollapsible = $hasFilters && ($filtersLayout === FiltersLayout::AboveContentCollapsible);
     $hasFiltersBelowContent = $hasFilters && ($filtersLayout === FiltersLayout::BelowContent);
+    $hasPaginationAboveContent = in_array($paginationLayout, [ PaginationLayout::AboveContent, PaginationLayout::AboveAndBelowContent]);
+    $hasPaginationBelowContent = in_array($paginationLayout, [PaginationLayout::BelowContent, PaginationLayout::AboveAndBelowContent]);
     $hasColumnToggleDropdown = $hasToggleableColumns();
     $hasHeader = $header || $heading || $description || ($headerActions && (! $isReordering)) || $isReorderable || count($groups) || $isGlobalSearchVisible || $hasFilters || count($filterIndicators) || $hasColumnToggleDropdown;
     $hasHeaderToolbar = $isReorderable || count($groups) || $isGlobalSearchVisible || $hasFiltersDialog || $hasColumnToggleDropdown;
@@ -250,6 +254,14 @@
         @if (count($filterIndicators))
             <x-filament-tables::filters.indicators
                 :indicators="$filterIndicators"
+            />
+        @endif
+
+        @if ($records instanceof \Illuminate\Contracts\Pagination\Paginator && $hasPaginationAboveContent &&  ((! ($records instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)) || $records->total()))
+            <x-filament::pagination
+                :page-options="$getPaginationPageOptions()"
+                :paginator="$records"
+                class="px-3 py-3 sm:px-6"
             />
         @endif
 
@@ -1102,13 +1114,15 @@
             @endif
         </div>
 
-        @if ($records instanceof \Illuminate\Contracts\Pagination\Paginator && ((! ($records instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)) || $records->total()))
+
+        @if ($records instanceof \Illuminate\Contracts\Pagination\Paginator && $hasPaginationBelowContent && ((! ($records instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)) || $records->total()))
             <x-filament::pagination
                 :page-options="$getPaginationPageOptions()"
                 :paginator="$records"
                 class="px-3 py-3 sm:px-6"
             />
         @endif
+
 
         @if ($hasFiltersBelowContent)
             <x-filament-tables::filters
