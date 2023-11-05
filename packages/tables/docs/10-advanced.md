@@ -47,6 +47,23 @@ public function table(Table $table): Table
 }
 ```
 
+### Placing pagination above, below, or above and below the table
+By default, pagination is placed below the table. You can change this by using the  method:`$table->paginationLayout()`
+Three options are available:
+- `AboveContent` - pagination is placed above the table
+- `BelowContent` - pagination is placed below the table
+- `AboveAndBelowContent` - pagination is placed above and below the table
+```php
+use Filament\Tables\Table;
+use Filament\Tables\Enums\PaginationLayout;
+
+public function table(Table $table): Table
+{
+    return $table
+        ->paginationLayout(PaginationLayout::AboveContent)
+}
+```
+
 ### Preventing query string conflicts with the pagination page
 
 By default, Livewire stores the pagination state in a `page` parameter of the URL query string. If you have multiple tables on the same page, this will mean that the pagination state of one table may be overwritten by the state of another table.
